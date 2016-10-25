@@ -1,0 +1,2 @@
+/big/users/hanli/cnncrf/python/crf/h5files/test2.h5
+/big/users/hanli/cnncrf/python/crf/h5files/test1.h5

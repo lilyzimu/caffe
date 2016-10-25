@@ -1,0 +1,12 @@
+/big/users/hanli/cnncrf/python/crf/h5files/train4.h5
+/big/users/hanli/cnncrf/python/crf/h5files/train10.h5
+/big/users/hanli/cnncrf/python/crf/h5files/train8.h5
+/big/users/hanli/cnncrf/python/crf/h5files/train11.h5
+/big/users/hanli/cnncrf/python/crf/h5files/train5.h5
+/big/users/hanli/cnncrf/python/crf/h5files/train7.h5
+/big/users/hanli/cnncrf/python/crf/h5files/train3.h5
+/big/users/hanli/cnncrf/python/crf/h5files/train1.h5
+/big/users/hanli/cnncrf/python/crf/h5files/train12.h5
+/big/users/hanli/cnncrf/python/crf/h5files/train6.h5
+/big/users/hanli/cnncrf/python/crf/h5files/train9.h5
+/big/users/hanli/cnncrf/python/crf/h5files/train2.h5
