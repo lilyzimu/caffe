@@ -3,7 +3,7 @@ import numpy as np
 
 # put this pyloss.py file under PYTHONPATH, which is under caffe/python folder. 
 
-import pycuda.autoinit
+
 #import pycuda.gpuarray as gpuarray
 #from pycuda.compiler import SourceModule
 #from pycuda.reduction import ReductionKernel
