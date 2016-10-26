@@ -8,7 +8,7 @@ layer {
   top: "meanPCA"
   hdf5_data_param {
     source: "examples/crf/train.txt"
-    batch_size: 50
+    batch_size: 10 
     shuffle: true
   }
   include: { phase: TRAIN }

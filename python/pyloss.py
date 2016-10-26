@@ -3,15 +3,15 @@ import numpy as np
 
 # put this pyloss.py file under PYTHONPATH, which is under caffe/python folder. 
 
-
-#import pycuda.gpuarray as gpuarray
+#import pycuda.autoinit
+import pycuda.gpuarray as gpuarray
 #from pycuda.compiler import SourceModule
 #from pycuda.reduction import ReductionKernel
-#from pycuda.elementwise import ElementwiseKernel
+from pycuda.elementwise import ElementwiseKernel
 
 #import caffe
 from caffe import Layer
-#import caffe.pycuda_util as pu
+import caffe.pycuda_util as pu
 
 dtype = np.float32
 
@@ -49,41 +49,44 @@ class PcaCudaEuclideanLossLayer(caffe.Layer):
 #        print 'png bottom[2].data.shape: ' + str(bottom[2].data.shape);  # (batchsize, 65536)
 #        print 'np.dot(bottom[1].data[i,:,:], bottom[0].data[i,:]).shape: ' + str(np.dot(bottom[1].data[0,:,:], bottom[0].data[0,:]).shape); #(65536,)  
 #        print 'bottom[2].data[i,:].shape: ' + str(bottom[2].data[0,:].shape);  # (65536,)
-        #with pu.caffe_cuda_context():
-            #linalg.init()
+        with pu.caffe_cuda_context():
+            linalg.init()
             for i in range(self.diff.shape[0]):
-                    #a =  bottom[1].data[i,:,:].data_as_pycuda_gpuarray() 
-                    #b =  bottom[0].data[i,:].data_as_pycuda_gpuarray() 
-                    #a =  bottom[1].data[i,:,:]
-                    #b =  bottom[0].data[i,:]
+                    #a =  bottom[1].data_as_pycuda_gpuarray() 
+                    #b =  bottom[0].data_as_pycuda_gpuarray() 
+                    a =  bottom[1].data[i,:,:].astype(np.float32);
+                    b =  bottom[0].data[i,:].astype(np.float32);
                     ##a = np.asarray(np.random.rand(4, 4), dtype=np.float32)
                     ##b = np.asarray(np.random.rand(4), dtype=np.float32)
-                    #a_gpu = gpuarray.to_gpu(a)
-                    #b_gpu = gpuarray.to_gpu(b)
-                    #c_gpu = linalg.dot(a_gpu, b_gpu)
+                    
+                    #a_gpu = gpuarray.GPUArray(a, dtype=np.float32)
+                    #b_gpu = gpuarray.GPUArray(b, dtype=np.float32)
+                    a_gpu = gpuarray.to_gpu(a)
+                    b_gpu = gpuarray.to_gpu(b)
+                    c_gpu = linalg.dot(a_gpu, b_gpu)
                     #self.diff[i,:] = c_gpu + bottom[2].data[i,:] - bottom[3].data[i,:];
                     self.diff[i,:] = np.dot(bottom[1].data[i,:,:], bottom[0].data[i,:]) + bottom[2].data[i,:] - bottom[3].data[i,:];
             top[0].data[...] = np.sum(self.diff**2) / bottom[3].num / 2.
-            self.transDiff = np.transpose(self.diff / bottom[3].num); # (65536, 50) 
-            #a_gpu = gpuarray.to_gpu(self.diff / bottom[3].num)
-            #at_gpu = linalg.transpose(a_gpu)
-            #self.transDiff = at_gpu; # (65536, 50)    
+            #self.transDiff = np.transpose(self.diff / bottom[3].num); # (65536, 50) 
+            a_gpu = gpuarray.to_gpu(self.diff / bottom[3].num)
+            at_gpu = linalg.transpose(a_gpu)
+            self.transDiff = at_gpu; # (65536, 50)    
 
     def backward(self, top, propagate_down, bottom):
-        for i in range(self.nPCAcoms): 
-            bottom[0].diff[:, i] = np.trace(np.dot( bottom[1].data[:,:,i], self.transDiff ));
-    
+        
 #        self.nPCAcoms = bottom[0].data.shape[1];
-        ##with pu.caffe_cuda_context():
-            ##linalg.init()
+        with pu.caffe_cuda_context():
             #for i in range(self.nPCAcoms): 
+                #bottom[0].diff[:, i] = np.trace(np.dot( bottom[1].data[:,:,i], self.transDiff ));
+            linalg.init()
+            for i in range(self.nPCAcoms): 
                 ##a =  bottom[1].data[:,:,i].data_as_pycuda_gpuarray() 
-                #a =  bottom[1].data[:,:,i]
-                #b_gpu = self.transDiff;
-                #a_gpu = gpuarray.to_gpu(a)
-                #c_gpu = linalg.dot(a_gpu, b_gpu)
-                #d_gpu = linalg.trace(c_gpu)
-                #bottom[0].diff[:, i] = d_gpu;
+                a =  bottom[1].data[:,:,i]
+                b_gpu = self.transDiff;
+                a_gpu = gpuarray.to_gpu(a)
+                c_gpu = linalg.dot(a_gpu, b_gpu)
+                d_gpu = linalg.trace(c_gpu)
+                bottom[0].diff[:, i] = d_gpu;
 
 
 
